@@ -94,96 +94,58 @@
     margin-bottom: 12px;
   }
 
-  /* Guidance toggle */
-  .guidance-toggle {
-    display: inline-flex;
+  /* Guidance — always visible */
+  .guidance {
+    background: rgba(153, 255, 255, 0.03);
+    border-left: 2px solid rgba(153, 255, 255, 0.12);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  .guidance-label {
+    display: flex;
     align-items: center;
     gap: 6px;
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    color: var(--cyan);
-    opacity: 0.6;
-    transition: opacity 0.25s;
-    margin-bottom: 14px;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .guidance-toggle:hover { opacity: 1; }
-  .guidance-toggle.open { opacity: 0.85; }
-
-  .guidance-toggle svg {
-    width: 14px;
-    height: 14px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-  }
-
-  .guidance-toggle.open svg {
-    transform: rotate(90deg);
-  }
-
-  .guidance-panel {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-    opacity: 0;
-    margin-bottom: 14px;
-  }
-
-  .guidance-panel.open {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-
-  .guidance-inner {
-    overflow: hidden;
-  }
-
-  .guidance-content {
-    background: rgba(153, 255, 255, 0.03);
-    border-left: 2px solid rgba(153, 255, 255, 0.15);
-    border-radius: 0 8px 8px 0;
-    padding: 14px 16px;
-    margin-bottom: 2px;
-  }
-
-  .guidance-content p.guidance-intro {
-    font-size: 0.72rem;
-    color: rgba(153, 255, 255, 0.45);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.68rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(153, 255, 255, 0.4);
     margin-bottom: 10px;
   }
 
-  .guidance-content ul {
+  .guidance-label svg {
+    width: 13px;
+    height: 13px;
+    opacity: 0.5;
+  }
+
+  .guidance ul {
     list-style: none;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
-  .guidance-content li {
-    font-size: 0.8rem;
+  .guidance li {
+    font-size: 0.78rem;
     color: var(--text-dim);
     line-height: 1.5;
-    padding-left: 18px;
+    padding-left: 16px;
     position: relative;
   }
 
-  .guidance-content li::before {
+  .guidance li::before {
     content: '';
     position: absolute;
     left: 0;
     top: 7px;
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
-    background: rgba(153, 255, 255, 0.25);
+    background: rgba(153, 255, 255, 0.2);
   }
 
   .options {
@@ -383,14 +345,11 @@
     <div class="question-block" data-q="Q1">
       <h3>Commercial Complexity</h3>
       <p class="subtitle">How much does design development impact cost?</p>
-      <div class="guidance-toggle" onclick="toggleGuidance(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-        <span>Guidance questions</span>
-      </div>
-      <div class="guidance-panel">
-        <div class="guidance-inner">
-          <div class="guidance-content">
-            <p class="guidance-intro">Consider asking</p>
+      <div class="guidance">
+        <div class="guidance-label">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 11V8"/><circle cx="8" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          Consider asking
+        </div>
             <ul>
               <li>How developed is the design at this stage (concept, planning, or technical)?</li>
               <li>Are there any elements still being explored that could significantly change cost?</li>
@@ -398,8 +357,6 @@
               <li>Has the client expressed interest in upgrading materials or specification during design?</li>
               <li>Are there planning or heritage constraints that may drive design changes later?</li>
             </ul>
-          </div>
-        </div>
       </div>
       <div class="options">
         <div class="option" data-val="1" onclick="sel(this)">
@@ -420,14 +377,11 @@
     <div class="question-block" data-q="Q2">
       <h3>Budget Sensitivity</h3>
       <p class="subtitle">How important is ongoing cost clarity?</p>
-      <div class="guidance-toggle" onclick="toggleGuidance(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-        <span>Guidance questions</span>
-      </div>
-      <div class="guidance-panel">
-        <div class="guidance-inner">
-          <div class="guidance-content">
-            <p class="guidance-intro">Consider asking</p>
+      <div class="guidance">
+        <div class="guidance-label">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 11V8"/><circle cx="8" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          Consider asking
+        </div>
             <ul>
               <li>How sensitive is the project to budget changes?</li>
               <li>Has the client set a strict cost limit that cannot move?</li>
@@ -435,8 +389,6 @@
               <li>Does the architect want frequent cost reassurance as the design develops?</li>
               <li>Is the project dependent on financial approvals or funding thresholds?</li>
             </ul>
-          </div>
-        </div>
       </div>
       <div class="options">
         <div class="option" data-val="1" onclick="sel(this)">
@@ -457,14 +409,11 @@
     <div class="question-block" data-q="Q3">
       <h3>Delivery Coordination Complexity</h3>
       <p class="subtitle">How much active coordination is needed?</p>
-      <div class="guidance-toggle" onclick="toggleGuidance(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-        <span>Guidance questions</span>
-      </div>
-      <div class="guidance-panel">
-        <div class="guidance-inner">
-          <div class="guidance-content">
-            <p class="guidance-intro">Consider asking</p>
+      <div class="guidance">
+        <div class="guidance-label">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 11V8"/><circle cx="8" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          Consider asking
+        </div>
             <ul>
               <li>How many consultants or specialists are involved in the design team?</li>
               <li>Are there multiple stakeholders influencing decisions (client representatives, family members, advisers)?</li>
@@ -472,8 +421,6 @@
               <li>Are there known areas where design coordination may be challenging?</li>
               <li>Will the project require frequent design workshops or coordination meetings?</li>
             </ul>
-          </div>
-        </div>
       </div>
       <div class="options">
         <div class="option" data-val="1" onclick="sel(this)">
@@ -494,14 +441,11 @@
     <div class="question-block" data-q="Q4">
       <h3>Client Experience &amp; Decision Structure</h3>
       <p class="subtitle">Client confidence in managing delivery?</p>
-      <div class="guidance-toggle" onclick="toggleGuidance(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-        <span>Guidance questions</span>
-      </div>
-      <div class="guidance-panel">
-        <div class="guidance-inner">
-          <div class="guidance-content">
-            <p class="guidance-intro">Consider asking</p>
+      <div class="guidance">
+        <div class="guidance-label">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 11V8"/><circle cx="8" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          Consider asking
+        </div>
             <ul>
               <li>Has the client delivered projects like this before?</li>
               <li>Do they have a clear decision-making structure?</li>
@@ -509,8 +453,6 @@
               <li>Do they have internal support (project manager, adviser, family office)?</li>
               <li>Do they appear uncertain about the construction or procurement process?</li>
             </ul>
-          </div>
-        </div>
       </div>
       <div class="options">
         <div class="option" data-val="1" onclick="sel(this)">
@@ -531,14 +473,11 @@
     <div class="question-block" data-q="Q5">
       <h3>Architectural Reliance on Commercial Support</h3>
       <p class="subtitle">Architect's reliance on cost/contract support?</p>
-      <div class="guidance-toggle" onclick="toggleGuidance(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-        <span>Guidance questions</span>
-      </div>
-      <div class="guidance-panel">
-        <div class="guidance-inner">
-          <div class="guidance-content">
-            <p class="guidance-intro">Consider asking</p>
+      <div class="guidance">
+        <div class="guidance-label">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 11V8"/><circle cx="8" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          Consider asking
+        </div>
             <ul>
               <li>Has the architect asked us to help explain costs to the client?</li>
               <li>Are there areas where the design team anticipates difficult cost discussions?</li>
@@ -546,8 +485,6 @@
               <li>Is the client already questioning cost or value?</li>
               <li>Would the architect prefer us to take the lead in presenting cost information?</li>
             </ul>
-          </div>
-        </div>
       </div>
       <div class="options">
         <div class="option" data-val="1" onclick="sel(this)">
@@ -742,12 +679,6 @@ function sel(el) {
   updateNav();
 }
 
-function toggleGuidance(el) {
-  const panel = el.nextElementSibling;
-  el.classList.toggle('open');
-  panel.classList.toggle('open');
-}
-
 function updateNav() {
   const step1Qs = ['Q1','Q2','Q3','Q4','Q5'];
   const step2Qs = ['A1','A2','A3','A4','A5','A6'];
@@ -814,10 +745,6 @@ function showResults() {
 function reset() {
   for (const k in answers) delete answers[k];
   document.querySelectorAll('.option.selected').forEach(o => o.classList.remove('selected'));
-  document.querySelectorAll('.guidance-toggle.open').forEach(t => {
-    t.classList.remove('open');
-    t.nextElementSibling.classList.remove('open');
-  });
   updateNav();
   goStep(1);
 }
