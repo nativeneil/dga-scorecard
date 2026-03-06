@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGA Service Scorecard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #272727;
+    --bg-card: #333;
+    --bg-card-hover: #3a3a3a;
+    --cyan: #99ffff;
+    --lime: #D3FB4C;
+    --text: #e8e8e8;
+    --text-dim: #aaa;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 6px;
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #444;
+    transition: background 0.4s;
+  }
+
+  .progress-step.active { background: var(--cyan); }
+  .progress-step.done { background: var(--lime); }
+
+  .step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--lime);
+    margin-bottom: 24px;
+  }
+
+  .question-block {
+    margin-bottom: 32px;
+  }
+
+  .question-block h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+
+  .question-block .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  /* Guidance toggle */
+  .guidance-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--cyan);
+    opacity: 0.6;
+    transition: opacity 0.25s;
+    margin-bottom: 14px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .guidance-toggle:hover { opacity: 1; }
+  .guidance-toggle.open { opacity: 0.85; }
+
+  .guidance-toggle svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+  }
+
+  .guidance-toggle.open svg {
+    transform: rotate(90deg);
+  }
+
+  .guidance-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    opacity: 0;
+    margin-bottom: 14px;
+  }
+
+  .guidance-panel.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .guidance-inner {
+    overflow: hidden;
+  }
+
+  .guidance-content {
+    background: rgba(153, 255, 255, 0.03);
+    border-left: 2px solid rgba(153, 255, 255, 0.15);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin-bottom: 2px;
+  }
+
+  .guidance-content p.guidance-intro {
+    font-size: 0.72rem;
+    color: rgba(153, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .guidance-content ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .guidance-content li {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .guidance-content li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(153, 255, 255, 0.25);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+
+  .option:hover { background: var(--bg-card-hover); border-color: #555; }
+  .option.selected { border-color: var(--cyan); background: rgba(153,255,255,0.08); }
+
+  .option .score-badge {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    background: #444;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+
+  .option.selected .score-badge {
+    background: var(--cyan);
+    color: var(--bg);
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    gap: 12px;
+  }
+
+  button {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--lime);
+    color: var(--bg);
+  }
+
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; filter: none; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border: 2px solid #555;
+  }
+
+  .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+  /* Results */
+  .results { text-align: center; }
+
+  .results .tier-card {
+    background: linear-gradient(135deg, rgba(153,255,255,0.1), rgba(211,251,76,0.08));
+    border: 2px solid var(--cyan);
+    border-radius: 16px;
+    padding: 40px 24px;
+    margin-bottom: 28px;
+  }
+
+  .results .tier-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--lime);
+    margin-bottom: 8px;
+  }
+
+  .results .tier-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .results .tier-desc {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .component-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+
+  .component-card h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--lime);
+    margin-bottom: 8px;
+  }
+
+  .component-card .component-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .component-card p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .score-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .score-item {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .score-item .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .score-item .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+
+  .hidden { display: none; }
+
+  @media (max-width: 480px) {
+    .container { padding: 24px 16px 40px; }
+    header h1 { font-size: 1.4rem; }
+    .results .tier-name { font-size: 1.3rem; }
+    .score-summary { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>DGA Service Scorecard</h1>
+    <p>Answer a few questions to find the right service level for your project.</p>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-step" id="prog-1"></div>
+    <div class="progress-step" id="prog-2"></div>
+    <div class="progress-step" id="prog-3"></div>
+  </div>
+
+  <!-- Step 1: Service Fit -->
+  <div id="step-1">
+    <div class="step-label">Step 1 of 2 — Service Fit</div>
+
+    <div class="question-block" data-q="Q1">
+      <h3>Commercial Complexity</h3>
+      <p class="subtitle">How much does design development impact cost?</p>
+      <div class="guidance-toggle" onclick="toggleGuidance(this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        <span>Guidance questions</span>
+      </div>
+      <div class="guidance-panel">
+        <div class="guidance-inner">
+          <div class="guidance-content">
+            <p class="guidance-intro">Consider asking</p>
+            <ul>
+              <li>How developed is the design at this stage (concept, planning, or technical)?</li>
+              <li>Are there any elements still being explored that could significantly change cost?</li>
+              <li>Are there specialist items or bespoke features that are not yet defined?</li>
+              <li>Has the client expressed interest in upgrading materials or specification during design?</li>
+              <li>Are there planning or heritage constraints that may drive design changes later?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Minimal — straightforward scope</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Some — moderate design evolution expected</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Significant — complex/evolving design with major cost implications</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="Q2">
+      <h3>Budget Sensitivity</h3>
+      <p class="subtitle">How important is ongoing cost clarity?</p>
+      <div class="guidance-toggle" onclick="toggleGuidance(this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        <span>Guidance questions</span>
+      </div>
+      <div class="guidance-panel">
+        <div class="guidance-inner">
+          <div class="guidance-content">
+            <p class="guidance-intro">Consider asking</p>
+            <ul>
+              <li>How sensitive is the project to budget changes?</li>
+              <li>Has the client set a strict cost limit that cannot move?</li>
+              <li>Has the client previously expressed concern about affordability?</li>
+              <li>Does the architect want frequent cost reassurance as the design develops?</li>
+              <li>Is the project dependent on financial approvals or funding thresholds?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Low — client comfortable with estimates</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Moderate — periodic updates needed</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>High — tight budget, real-time cost control required</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="Q3">
+      <h3>Delivery Coordination Complexity</h3>
+      <p class="subtitle">How much active coordination is needed?</p>
+      <div class="guidance-toggle" onclick="toggleGuidance(this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        <span>Guidance questions</span>
+      </div>
+      <div class="guidance-panel">
+        <div class="guidance-inner">
+          <div class="guidance-content">
+            <p class="guidance-intro">Consider asking</p>
+            <ul>
+              <li>How many consultants or specialists are involved in the design team?</li>
+              <li>Are there multiple stakeholders influencing decisions (client representatives, family members, advisers)?</li>
+              <li>Is the programme tight or driven by external deadlines?</li>
+              <li>Are there known areas where design coordination may be challenging?</li>
+              <li>Will the project require frequent design workshops or coordination meetings?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Simple — single contractor, standard programme</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Moderate — few trades, some coordination</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Complex — multiple packages, phased delivery</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="Q4">
+      <h3>Client Experience &amp; Decision Structure</h3>
+      <p class="subtitle">Client confidence in managing delivery?</p>
+      <div class="guidance-toggle" onclick="toggleGuidance(this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        <span>Guidance questions</span>
+      </div>
+      <div class="guidance-panel">
+        <div class="guidance-inner">
+          <div class="guidance-content">
+            <p class="guidance-intro">Consider asking</p>
+            <ul>
+              <li>Has the client delivered projects like this before?</li>
+              <li>Do they have a clear decision-making structure?</li>
+              <li>Are they comfortable making timely decisions when needed?</li>
+              <li>Do they have internal support (project manager, adviser, family office)?</li>
+              <li>Do they appear uncertain about the construction or procurement process?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Experienced — client can manage independently</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Some experience — needs periodic guidance</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Limited — needs hands-on support throughout</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="Q5">
+      <h3>Architectural Reliance on Commercial Support</h3>
+      <p class="subtitle">Architect's reliance on cost/contract support?</p>
+      <div class="guidance-toggle" onclick="toggleGuidance(this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+        <span>Guidance questions</span>
+      </div>
+      <div class="guidance-panel">
+        <div class="guidance-inner">
+          <div class="guidance-content">
+            <p class="guidance-intro">Consider asking</p>
+            <ul>
+              <li>Has the architect asked us to help explain costs to the client?</li>
+              <li>Are there areas where the design team anticipates difficult cost discussions?</li>
+              <li>Does the architect expect us to help manage expectations around budget?</li>
+              <li>Is the client already questioning cost or value?</li>
+              <li>Would the architect prefer us to take the lead in presenting cost information?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Low — architect handles commercial matters</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Moderate — needs support at key stages</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>High — needs continuous commercial partnership</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn-primary" id="btn-next-1" disabled onclick="goStep(2)">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Architecture -->
+  <div id="step-2" class="hidden">
+    <div class="step-label">Step 2 of 2 — Architecture</div>
+
+    <div class="question-block" data-q="A1">
+      <h3>Contractual Structure Complexity</h3>
+      <p class="subtitle">How complex is the contractual arrangement?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Standard single contract</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Modified standard or design &amp; build</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Bespoke / multi-party contracts</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="A2">
+      <h3>Need for Independent Contract Authority</h3>
+      <p class="subtitle">Is an independent contract administrator needed?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Not needed — architect administers</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Helpful at key stages</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Essential — independent CA required throughout</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="A3">
+      <h3>Number of Decision Interfaces</h3>
+      <p class="subtitle">How many stakeholders are involved in decisions?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Single decision-maker</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Small committee (2–3)</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Multiple stakeholders / complex governance</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="A4">
+      <h3>Programme Sensitivity</h3>
+      <p class="subtitle">How critical is the delivery timeline?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Flexible timeline</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Target dates, some flex</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Fixed deadline, critical programme</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="A5">
+      <h3>Architect's Desired Role in Delivery</h3>
+      <p class="subtitle">How involved does the architect want to be in delivery?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Full oversight — wants to lead delivery</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Shared — happy to collaborate on delivery</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Design-focused — prefers to hand off delivery management</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" data-q="A6">
+      <h3>Client Involvement / Confidence</h3>
+      <p class="subtitle">How involved and experienced is the client?</p>
+      <div class="options">
+        <div class="option" data-val="1" onclick="sel(this)">
+          <span class="score-badge">1</span>
+          <span>Hands-on, experienced client</span>
+        </div>
+        <div class="option" data-val="2" onclick="sel(this)">
+          <span class="score-badge">2</span>
+          <span>Involved but needs guidance</span>
+        </div>
+        <div class="option" data-val="3" onclick="sel(this)">
+          <span class="score-badge">3</span>
+          <span>Hands-off or inexperienced</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goStep(1)">&larr; Back</button>
+      <button class="btn-primary" id="btn-results" disabled onclick="showResults()">See Results &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="step-3" class="hidden">
+    <div class="results">
+      <div class="tier-card">
+        <div class="tier-label">Recommended Service</div>
+        <div class="tier-name" id="res-tier"></div>
+        <div class="tier-desc" id="res-tier-desc"></div>
+      </div>
+
+      <div class="component-card">
+        <h4>Dominant Component</h4>
+        <div class="component-name" id="res-component"></div>
+        <p id="res-component-desc"></p>
+      </div>
+
+      <div class="score-summary">
+        <div class="score-item">
+          <div class="label">Service Fit</div>
+          <div class="value" id="res-fit"></div>
+        </div>
+        <div class="score-item">
+          <div class="label">Blended PM</div>
+          <div class="value" id="res-pm"></div>
+        </div>
+        <div class="score-item">
+          <div class="label">Blended CA</div>
+          <div class="value" id="res-ca"></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="reset()" style="width:100%;max-width:300px;">Start Over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const answers = {};
+
+function sel(el) {
+  const block = el.closest('.question-block');
+  const q = block.dataset.q;
+  block.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[q] = parseInt(el.dataset.val);
+  updateNav();
+}
+
+function toggleGuidance(el) {
+  const panel = el.nextElementSibling;
+  el.classList.toggle('open');
+  panel.classList.toggle('open');
+}
+
+function updateNav() {
+  const step1Qs = ['Q1','Q2','Q3','Q4','Q5'];
+  const step2Qs = ['A1','A2','A3','A4','A5','A6'];
+  document.getElementById('btn-next-1').disabled = !step1Qs.every(q => answers[q]);
+  document.getElementById('btn-results').disabled = !step2Qs.every(q => answers[q]);
+}
+
+function goStep(n) {
+  document.getElementById('step-1').classList.toggle('hidden', n !== 1);
+  document.getElementById('step-2').classList.toggle('hidden', n !== 2);
+  document.getElementById('step-3').classList.toggle('hidden', n !== 3);
+
+  document.getElementById('prog-1').className = 'progress-step' + (n >= 1 ? (n > 1 ? ' done' : ' active') : '');
+  document.getElementById('prog-2').className = 'progress-step' + (n >= 2 ? (n > 2 ? ' done' : ' active') : '');
+  document.getElementById('prog-3').className = 'progress-step' + (n >= 3 ? ' active' : '');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  const fitTotal = answers.Q1 + answers.Q2 + answers.Q3 + answers.Q4 + answers.Q5;
+
+  let tier, tierDesc;
+  if (fitTotal <= 7) {
+    tier = 'Advisory Only';
+    tierDesc = 'A lightweight engagement — one-off costing support or periodic advice. No ongoing service needed. Ideal when the client and architect can manage delivery independently.';
+  } else if (fitTotal <= 11) {
+    tier = 'DGA Plus';
+    tierDesc = 'Managed commercial support that scales as the project evolves. DGA provides cost management, procurement guidance, and periodic contract oversight without full delivery leadership.';
+  } else {
+    tier = 'Full DGA Service (QS + PM)';
+    tierDesc = 'Comprehensive commercial and delivery leadership. DGA takes an active role in cost management, contract administration, programme coordination, and client-side project management.';
+  }
+
+  const qsIndex = (answers.Q1 + answers.Q2 + answers.A1) / 3;
+  const pmIndex = (answers.Q4 + answers.Q5) / 2;
+  const caIndex = (answers.A1 + answers.A2) / 2;
+  const blendedPM = (pmIndex + answers.A5) / 2;
+  const blendedCA = (caIndex + answers.A5) / 2;
+
+  let component, componentDesc;
+  if (blendedCA >= 2.5 && (blendedCA - blendedPM) > 0.2) {
+    component = 'Contract Administration Focus';
+    componentDesc = 'The scoring indicates a strong need for independent contract administration. The contractual complexity and architect\'s preferred role suggest DGA should lead on contract matters — certifications, instructions, and dispute avoidance.';
+  } else if (blendedPM >= 2.5 && (blendedPM - blendedCA) > 0.2) {
+    component = 'Project Management Focus';
+    componentDesc = 'The scoring points toward delivery and coordination as the primary need. DGA should focus on programme management, stakeholder coordination, and ensuring the project stays on track.';
+  } else {
+    component = 'QS / Balanced Approach';
+    componentDesc = 'No single component dominates — the project benefits from a balanced commercial approach. DGA should provide integrated quantity surveying with proportionate contract and delivery support.';
+  }
+
+  document.getElementById('res-tier').textContent = tier;
+  document.getElementById('res-tier-desc').textContent = tierDesc;
+  document.getElementById('res-component').textContent = component;
+  document.getElementById('res-component-desc').textContent = componentDesc;
+  document.getElementById('res-fit').textContent = fitTotal + ' / 15';
+  document.getElementById('res-pm').textContent = blendedPM.toFixed(1);
+  document.getElementById('res-ca').textContent = blendedCA.toFixed(1);
+
+  goStep(3);
+}
+
+function reset() {
+  for (const k in answers) delete answers[k];
+  document.querySelectorAll('.option.selected').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.guidance-toggle.open').forEach(t => {
+    t.classList.remove('open');
+    t.nextElementSibling.classList.remove('open');
+  });
+  updateNav();
+  goStep(1);
+}
+
+goStep(1);
+</script>
+</body>
+</html>
